@@ -1,5 +1,6 @@
 package ec.edu.espe.banquito.accounts.service;
 
+import ec.edu.espe.banquito.accounts.controller.req.AccountReqDto;
 import ec.edu.espe.banquito.accounts.controller.req.AccountTransactionReqDto;
 import ec.edu.espe.banquito.accounts.controller.res.AccountTransactionResDto;
 import ec.edu.espe.banquito.accounts.model.Account;
@@ -7,6 +8,7 @@ import ec.edu.espe.banquito.accounts.model.AccountTransaction;
 import ec.edu.espe.banquito.accounts.repository.AccountRepository;
 import ec.edu.espe.banquito.accounts.repository.AccountTransactionRepository;
 import ec.edu.espe.banquito.accounts.service.mapper.AccountTransactionMapper;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,6 +38,8 @@ public class AccountTransanctionService {
     }
 
     public AccountTransactionResDto bankTransfer(AccountTransactionReqDto accountTransactionReqDto){
+        UUID uniqueId = UUID.randomUUID();
+        String reference = uniqueId.toString();
         AccountTransaction accountTransaction=new AccountTransaction();
         Optional<Account> accountDebtorTmp=this.accountRepository.findValidByCodeInternalAccount(accountTransactionReqDto.getDebtorAccount());
         switch (accountTransactionReqDto.getTransactionType()){
@@ -45,11 +49,23 @@ public class AccountTransanctionService {
                 //BigDecimal ammountTmp=accountTransactionReqDto.getAmmount();
                 System.out.println(ammountTmp);
                 if(accountDebtorTmp.isPresent() && accountCredtorTmp.isPresent()){
+
+                    Double ammountDebtorTemp=accountDebtorTmp.get().getAvailableBalance().doubleValue();
+                    Double resultDebtor=ammountDebtorTemp-ammountTmp;
+                    System.out.println(resultDebtor);
+                    accountDebtorTmp.get().setAvailableBalance(BigDecimal.valueOf(resultDebtor));
+
+                    Double ammountCredtorTemp=accountCredtorTmp.get().getAvailableBalance().doubleValue();
+                    Double resultCredtor=ammountCredtorTemp +ammountTmp;
+                    System.out.println(resultCredtor);
+                    accountCredtorTmp.get().setAvailableBalance(BigDecimal.valueOf(resultCredtor));
+
                     AccountTransaction accountTransactionDebtor=AccountTransaction.builder()
                             .uniqueKey(UUID.randomUUID().toString())
                             .transactionType(AccountTransaction.TransactionType.TRANSFER)
-                            .reference(accountTransactionReqDto.getReference())
+                            .reference(reference/*accountTransactionReqDto.getReference()*/)
                             .ammount((BigDecimal.valueOf(ammountTmp*-1)))
+                            .balanceAfterTransaction(BigDecimal.valueOf(resultDebtor))
                             .creditorAccount(accountTransactionReqDto.getCreditorAccount())
                             .creditorBankCode(accountTransactionReqDto.getCreditorBankCode())
                             .debtorAccount(accountTransactionReqDto.getDebtorAccount())
@@ -69,12 +85,13 @@ public class AccountTransanctionService {
                     AccountTransaction accountTransactionCredtor=AccountTransaction.builder()
                             .uniqueKey(UUID.randomUUID().toString())
                             .transactionType(AccountTransaction.TransactionType.TRANSFER)
-                            .reference(accountTransactionReqDto.getReference())
+                            .reference(reference/*accountTransactionReqDto.getReference()*/)
                             .ammount((BigDecimal.valueOf(ammountTmp)))
+                            .balanceAfterTransaction(BigDecimal.valueOf(resultCredtor))
                             .creditorAccount(accountTransactionReqDto.getCreditorAccount())
                             .creditorBankCode(accountTransactionReqDto.getCreditorBankCode())
-                            .debtorAccount(accountTransactionReqDto.getDebtorBankCode())
-                            .debtorBankCode(accountTransactionReqDto.getDebtorAccount())
+                            .debtorAccount(accountTransactionReqDto.getDebtorAccount())
+                            .debtorBankCode(accountTransactionReqDto.getDebtorBankCode())
                             .creationDate(new Date())
                             .bookingDate(new Date())
                             .valueDate(new Date())
@@ -85,15 +102,7 @@ public class AccountTransanctionService {
                             .valid(true)
                             .build();
 
-                    Double ammountDebtorTemp=accountDebtorTmp.get().getAvailableBalance().doubleValue();
-                    Double resultDebtor=ammountDebtorTemp-ammountTmp;
-                    System.out.println(resultDebtor);
-                    accountDebtorTmp.get().setAvailableBalance(BigDecimal.valueOf(resultDebtor));
-
-                    Double ammountCredtorTemp=accountDebtorTmp.get().getAvailableBalance().doubleValue();
-                    Double resultCredtor=ammountCredtorTemp +ammountTmp;
-                    System.out.println(resultCredtor);
-                    accountCredtorTmp.get().setAvailableBalance(BigDecimal.valueOf(resultCredtor));
+                    
 
                     this.accountTransactionRepository.save(accountTransactionDebtor);
                     this.accountTransactionRepository.save(accountTransactionCredtor);

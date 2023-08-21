@@ -1,5 +1,6 @@
 package ec.edu.espe.banquito.accounts.service;
 
+import ec.edu.espe.banquito.accounts.controller.req.AccountReqDto;
 import ec.edu.espe.banquito.accounts.controller.res.AccountResDto;
 import ec.edu.espe.banquito.accounts.model.Account;
 import ec.edu.espe.banquito.accounts.repository.AccountRepository;
@@ -9,7 +10,13 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import javax.security.auth.login.AccountNotFoundException;
 
 @Service
 @AllArgsConstructor
@@ -51,6 +58,29 @@ public class AccountService {
         }));
     }
 
+    
+
+    @Transactional
+    public AccountResDto updateMaxOverdraft(String accountUK, BigDecimal maxOverdraft) {
+        Optional<Account> account = accountRepository.findValidByUK(accountUK);
+        System.out.println(maxOverdraft);
+        if(account.isPresent()){
+            account.get().setMaxOverdraft(maxOverdraft);
+            this.accountRepository.save(account.get());
+            System.out.println(maxOverdraft);
+        }
+        return this.accountMapper.toRes(account.get());
+    }
+
+    public void createAccount(AccountReqDto accountRQ){
+        String uniqueKey = UUID.randomUUID().toString();
+        Account account = this.accountMapper.toReq(accountRQ);
+        account.setUniqueKey(uniqueKey);
+        account.setActivationDate(new Date());
+        account.setCreatedAt(new Date());
+        //account.setCreatedBy(account.getClientUk());
+        this.accountRepository.save(account);
+    }
 
 
 

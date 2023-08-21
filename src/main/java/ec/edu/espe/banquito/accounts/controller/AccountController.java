@@ -1,9 +1,10 @@
 package ec.edu.espe.banquito.accounts.controller;
 
+import ec.edu.espe.banquito.accounts.controller.req.AccountReqDto;
 import ec.edu.espe.banquito.accounts.controller.req.AccountTransactionReqDto;
 import ec.edu.espe.banquito.accounts.controller.res.AccountResDto;
-import ec.edu.espe.banquito.accounts.controller.res.AccountTransactionResDto;
 import ec.edu.espe.banquito.accounts.controller.res.ProductResDto;
+import ec.edu.espe.banquito.accounts.controller.res.AccountTransactionResDto;
 import ec.edu.espe.banquito.accounts.service.AccountService;
 import ec.edu.espe.banquito.accounts.service.AccountTransanctionService;
 import lombok.RequiredArgsConstructor;
@@ -11,12 +12,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.util.List;
+
+import javax.naming.spi.DirStateFactory.Result;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/accounts")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:4200")
 public class AccountController {
     private final RestTemplate restTemplate;
     private final AccountService accountService;
@@ -56,5 +60,24 @@ public class AccountController {
             ){
         return ResponseEntity.ok(this.accountTransanctionService.bankTransfer(accountTransactionReqDto));
     }
+
+    @PutMapping("/account/{accountUK}/max-overdraft")
+    public ResponseEntity<AccountResDto> updateMaxOverdraft(
+            @PathVariable("accountUK") String accountUK,
+            @RequestParam BigDecimal maxOverdraft
+    ){
+        
+        AccountResDto updatedAccount = accountService.updateMaxOverdraft(accountUK, maxOverdraft);
+        return ResponseEntity.ok(updatedAccount);
+    }
+
+    @PostMapping
+    public ResponseEntity createAccount(@RequestBody AccountReqDto accountRQ){
+        this.accountService.createAccount(accountRQ);
+        return ResponseEntity.ok().build();
+    }
+
+
+    
 
 }

@@ -26,6 +26,11 @@ public class AccountReqDto implements Serializable {
     private Date lastInterestCalculationDate;
     private Boolean allowOverdraft;
     private BigDecimal maxOverdraft;
+    private String accountHolderCode;
+    private String accountHolderType;
+    private String codeInternationalAccount;
+    private String state;
+    private BigDecimal interestRate;
 
     private String clientUk;
 

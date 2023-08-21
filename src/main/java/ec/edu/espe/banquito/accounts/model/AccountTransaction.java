@@ -35,6 +35,8 @@ public class AccountTransaction {
     private String reference;
     @Column(name = "AMMOUNT", precision = 18, scale = 2, nullable = false)
     private BigDecimal ammount;
+    @Column(name = "BALANCE_AFTER_TRANSACTION", precision = 18, scale = 2, nullable = false)
+    private BigDecimal balanceAfterTransaction;
     @Column(name = "CREDITOR_BANK_CODE", length = 100, nullable = true)
     private String creditorBankCode;
     @Column(name = "CREDITOR_ACCOUNT", length = 100, nullable = true)

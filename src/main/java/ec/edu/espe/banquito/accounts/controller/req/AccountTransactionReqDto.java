@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -20,6 +21,7 @@ public class AccountTransactionReqDto implements Serializable {
 
     private String reference;
     private BigDecimal ammount;
+    private BigDecimal balanceAfterTransaction;
     private String creditorBankCode;
     private String creditorAccount;
     private String debtorBankCode;

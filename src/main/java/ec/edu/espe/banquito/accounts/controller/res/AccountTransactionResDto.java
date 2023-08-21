@@ -1,5 +1,7 @@
 package ec.edu.espe.banquito.accounts.controller.res;
 
+import ec.edu.espe.banquito.accounts.model.Account;
+import ec.edu.espe.banquito.accounts.model.AccountTransaction;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +22,7 @@ public class AccountTransactionResDto implements Serializable {
     private String transactionType;
     private String reference;
     private BigDecimal ammount;
+    private BigDecimal balanceAfterTransaction;
     private String creditorBankCode;
     private String creditorAccount;
     private String debtorBankCode;
