@@ -1,5 +1,7 @@
 package ec.edu.espe.banquito.accounts.repository;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,5 +15,6 @@ public interface AccountTransactionRepository extends JpaRepository<AccountTrans
             "where (act.valid=true) and act.account.uniqueKey=:accountUK")
     List<AccountTransaction> findValidByAccountUniqueKeyOrderByBookingDateDesc(@Param("accountUK") String accountUK);
 
+    List<AccountTransaction> findValidByAccountUniqueKeyAndBookingDateBetweenOrderByBookingDateDesc(String accountUK, Date startDate, Date endDate);
 
 }

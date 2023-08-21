@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +33,19 @@ public class AccountTransanctionService {
         if(accountTransactionList.isEmpty()){
             log.error("No transactions in this account");
             throw new RuntimeException("No transactions in this account");
+        }
+
+        return accountTransactionList;
+    }
+
+    public List<AccountTransactionResDto> findTransactionsByDateRange(String accountUK, Date startDate, Date endDate) {
+        List<AccountTransactionResDto> accountTransactionList = this.accountTransactionMapper.toRes(
+            this.accountTransactionRepository.findValidByAccountUniqueKeyAndBookingDateBetweenOrderByBookingDateDesc(accountUK, startDate, endDate)
+        );
+
+        if (accountTransactionList.isEmpty()) {
+            log.error("No transactions in this account within the specified date range");
+            throw new RuntimeException("No transactions in this account within the specified date range");
         }
 
         return accountTransactionList;

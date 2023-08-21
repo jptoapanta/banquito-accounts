@@ -63,11 +63,10 @@ public class AccountService {
     @Transactional
     public AccountResDto updateMaxOverdraft(String accountUK, BigDecimal maxOverdraft) {
         Optional<Account> account = accountRepository.findValidByUK(accountUK);
-        System.out.println(maxOverdraft);
+        
         if(account.isPresent()){
             account.get().setMaxOverdraft(maxOverdraft);
             this.accountRepository.save(account.get());
-            System.out.println(maxOverdraft);
         }
         return this.accountMapper.toRes(account.get());
     }
